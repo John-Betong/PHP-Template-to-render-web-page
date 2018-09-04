@@ -14,10 +14,10 @@ PUBLIC function __construct()
   session_start();
     
 # DEFAULTS SET ALL URLs to checked  
-  $_SESSION['aHttps1'] = isset($_POST['http1'])  ? 'checked' : '';
-  $_SESSION['aHttps2'] = isset($_POST['http2'])  ? 'checked' : '';
-  $_SESSION['aHttps3'] = isset($_POST['http3'])  ? 'checked' : '';
-  $_SESSION['aHttps4'] = isset($_POST['http4'])  ? 'checked' : '';
+  $_SESSION['aHttps1'] = isset($_POST['http1'])  ? 'checked' : 'XXX';
+  $_SESSION['aHttps2'] = isset($_POST['http2'])  ? 'checked' : 'XXX';
+  $_SESSION['aHttps3'] = isset($_POST['http3'])  ? 'checked' : 'XXX';
+  $_SESSION['aHttps4'] = isset($_POST['http4'])  ? 'checked' : 'XXX';
 
 # CANNOT DECLARE RETURN TYPE  
   # return $result;
@@ -30,10 +30,10 @@ PUBLIC function getHttps()
 {
   if( empty($_POST) ):
     $aHttps = [
-    'http1' => isset($_POST['http1']) || $_SESSION['aHttps1'] ? 'checked' : '',
-    'http2' => isset($_POST['http2']) || $_SESSION['aHttps2'] ? 'checked' : '',
-    'http3' => isset($_POST['http3']) || $_SESSION['aHttps3'] ? 'checked' : '',
-    'http4' => isset($_POST['http4']) || $_SESSION['aHttps4'] ? 'checked' : '',
+    'http1' => isset($_POST['http1']) || $_SESSION['aHttps1'] ? 'checked' : 'XXX',
+    'http2' => isset($_POST['http2']) || $_SESSION['aHttps2'] ? 'checked' : 'XXX',
+    'http3' => isset($_POST['http3']) || $_SESSION['aHttps3'] ? 'checked' : 'XXX',
+    'http4' => isset($_POST['http4']) || $_SESSION['aHttps4'] ? 'checked' : 'XXX',
     ]; 
   else:
     $aHttps = [
@@ -53,22 +53,46 @@ PUBLIC function getHttps()
 }
 
 
-//=====================================================
+//==============================================
 PUBLIC function getModes()
 :array
 {
-  # echo '<h2 class="tac">' .__METHOD__ .'</h2>';
+    $aModes = [
+    'clear'   => isset($_POST['clear'])   ?? FALSE,
+    'simple'  => isset($_POST['simple'])  ?? FALSE,
+    'verbose' => isset($_POST['verbose']) ?? FALSE,
+    'sample'  => isset($_POST['sample'])  ?? FALSE,
+  ];  
 
-  return [];
+  return $aModes;
 }
 
 //=====================================================
-PUBLIC function getSites()
+PUBLIC function getSites( array $aModes)
 :array
 {
-  # echo '<h2 class="tac">' .__METHOD__ .'</h2>';
+# MAYBE DEFAULT SITES
+  if( $aModes['sample'] ):  
+    $aSites = [
+      'letsencrypt.org',
+      'apple.com',
+      'bing.com',
+      ];      
 
-  return [];
+  else: 
+    $aSites = [];
+    if( isset($_POST['URLS']) ):
+      $aSites = explode( "\n", $_POST['URLS'] );
+    endif;
+    foreach($aSites as $id => $tmp):  
+      if( empty( trim($tmp) ) || '\n'===$tmp):
+        unset( $aSites[$id]);
+      endif;  
+    endforeach;  
+  endif;
+  # $sSites = implode("\n", $aSites);
+
+  return $aSites;
 }
 
 //==============================================
@@ -142,9 +166,11 @@ echo $tmp;
 PUBLIC function renderCurl( array $aModes, array $aSites, array $aHttps)
 :string
 {
-  # echo '<h2 class="tac">' .__METHOD__ .'</h2>';
+  $result = '<h2 class="tac">' .__METHOD__ .'</h2>';
 
-  return $result = '';
+  echo $result;
+  
+  return $result;
 }
 
 //=====================================================
@@ -176,11 +202,11 @@ ____TMP;
 PUBLIC function renderVerbose( array $aModes, array $aSites, array $aHttps)
 :string
 {
-  $result = '';
+  $result = '<h2 class="tac">' .__METHOD__ .'</h2>';
 
-  echo '<h2 class="tac">' .__METHOD__ .'</h2>';
+  echo $result;
 
-  return FALSE;
+  return $result;
 }
 
 
@@ -245,3 +271,30 @@ ____TMP;
 
 
 }///endclass 
+
+//==========================================================
+function fred($val, $title='YES we have no $title', $vd=NULL)
+:bool
+{
+  $result = 'NOT REQUIRED';
+
+# SET $var  
+  if($vd):
+    $var = var_dump($val, TRUE); 
+  else:
+    $var = print_r($val, TRUE); 
+  endif;  
+
+  $gType = gettype($var);
+  $tmp = <<< ______TMP
+    <dl class="w88 mga bd1 bgs p42 fss">
+      <dt> $title ==> gettype( $gType ) </dt>
+        <dd>
+          <pre class="bd1 bgs p42 fss"> $var </pre>
+        </dd>
+     </dl>
+______TMP;
+  echo $tmp;    
+
+  return FALSE; // $result;
+}
