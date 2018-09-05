@@ -163,15 +163,56 @@ echo $tmp;
 
 
 //=====================================================
-PUBLIC function renderCurl( array $aModes, array $aSites, array $aHttps)
+PUBLIC function renderCurl( array $aSites, array $aHttps)
 :string
 {
-  $result = '<h2 class="tac">' .__METHOD__ .'</h2>';
+  # $result = '';
+  $msg = 'Please add at least one site to start testing'; // RETURN $result 
 
-  echo $result;
-  
-  return $result;
+  if( empty($aSites) ):
+    echo '<h1 class="fgr tac">' . $msg .'</h1>';
+  endif;  
+
+# WHATEVER
+  $tStart = microtime(true);
+    foreach($aSites as $id => $url):
+      echo '<p> &nbsp; </p>';
+      echo '<div class="w88 mga bgs">';
+        $url = $this->fnRemovePrefix($url);
+        $url = trim($url);
+        if( empty( $url ) ):
+          # echo '<br>PREVENT BLANK LINES';
+        else:  
+          if( $aHttps['http4'] ):
+              $aHeader = $this->fnCurlHeaders('https://www.' .$url);
+            echo "\n";
+          endif;  
+          if( $aHttps['http3'] ):
+            $aHeader = $this->fnCurlHeaders('https://' .$url);
+            echo "\n";
+          endif;  
+          if( $aHttps['http2'] ):
+            $aHeader = $this->fnCurlHeaders('http://www.' .$url);
+            echo "\n";
+          endif;  
+          if( $aHttps['http1'] ):
+            $aHeader = $this->fnCurlHeaders('http://' .$url);
+            echo "\n";
+          endif;  
+          $elapsed = number_format( (float) microtime(true) - $tStart, 3);
+          $msg2 = ''
+               . '<i class="ooo flr">'
+               .   $elapsed .'secs'
+               . '</i>';   
+          $msg2 .= '<h4 class="tac"> ¯\_(ツ)_/¯ </h4>';
+          echo $msg2;         
+        endif;  
+      echo '</div>';  
+    endforeach;  
+
+  return $msg;
 }
+
 
 //=====================================================
 PUBLIC function renderLetsEncrypt()
@@ -198,16 +239,58 @@ ____TMP;
   return FALSE; // NO RETURN    
 }
 
+
 //=====================================================
 PUBLIC function renderVerbose( array $aModes, array $aSites, array $aHttps)
 :string
 {
-  $result = '<h2 class="tac">' .__METHOD__ .'</h2>';
+  # $result = '';
+  $msg = 'NOT USED'; // RETURN $result 
 
-  echo $result;
+  # $result = '';
+  $msg = 'Please add at least one site to start testing'; // RETURN $result 
 
-  return $result;
+  if( empty($aSites) ):
+    echo '<h1 class="fgr tac">' . $msg .'</h1>';
+  endif;  
+
+  $tStart = microtime(true);
+
+# GET_HEADERS(...);
+    foreach($aSites as $id => $url):
+        $url = $this->fnRemovePrefix($url);
+        $url = trim($url);
+        if( empty( $url ) ):
+          # echo '<br>PREVENT BLANK LINES';
+        else:  
+          if( $aHttps['http4'] ):
+            $aHeader = $this->fnGetHeaders('https://www.' .$url, $aModes);
+            echo "\n";
+          endif;  
+          if( $aHttps['http3'] ):
+            $aHeader = $this->fnGetHeaders('https://' .$url, $aModes);
+            echo "\n";
+          endif;  
+          if( $aHttps['http2'] ):
+            $aHeader = $this->fnGetHeaders('http://www.' .$url, $aModes);
+            echo "\n";
+          endif;  
+          if( $aHttps['http1'] ):
+            $aHeader = $this->fnGetHeaders('http://' .$url, $aModes);
+            echo "\n";
+          endif;  
+          $elapsed = number_format( (float) microtime(true) - $tStart, 3);
+          $msg .= ''
+               . '<i class="ooo flr">'
+               .   $elapsed .'secs'
+               . '</i>';   
+          $msg .= '<h4 class="tac"> ¯\_(ツ)_/¯ </h4>';         
+        endif;  
+    endforeach;  
+
+  return $msg;
 }
+
 
 
 //=====================================================
@@ -268,6 +351,255 @@ ____TMP;
 
   return $result;    
 }
+
+
+//=======================================        
+//=======================================        
+PRIVATE function fnRemovePrefix( string $url)
+:string
+{
+  $url = trim($url);
+  $url = strtolower($url);
+
+  /*
+    BEWARE: CHECK FOR LONGEST STRING FIRST
+  */  
+
+  if( 'http://www.' === substr($url, 0, 11) ):
+    $result = substr($url, 11);
+
+  elseif( 'http://' === substr($url, 0, 7) ):
+    $result = substr($url, 7);
+
+  elseif( 'https://www.' === substr($url, 0, 12) ):
+    $result = substr($url, 12);
+
+  elseif( 'https://' === substr($url, 0, 8) ):
+    $result = substr($url, 8);
+
+  elseif( '//www.' === substr($url, 0, 6) ):
+    $result = substr($url, 6);
+
+  elseif( 'www.' === substr($url, 0, 4) ):
+    $result = substr($url, 4);
+
+  elseif( '//' === substr($url, 0, 2) ):
+    $result = substr($url, 2);
+
+  else:
+    $result = $url;  
+  endif;    
+
+  return $result;
+}
+
+//=======================================        
+//=======================================        
+PRIVATE function fnCurlHeaders(string $url)
+:bool // NOT REQUIRED
+{
+  if( ! $url 
+      || ! is_string($url) 
+      || ! preg_match
+           (
+            '/^http(s)?:\/\/[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(\/.*)?$/i', $url)
+         ):
+    echo $this->fnWhoops('Whoops - Bad URL ==> ' . $url, $url);
+
+    return FALSE; // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  endif;
+
+# CURL HEADER ONLY WITH ELAPSED
+  /* \n SEPERATED VARIBLE
+      HTTP/1.1 200 OK
+      ETag: "52ee03de84b1b44964304ce117395227:1533631913"
+      Last-Modified: Tue, 07 Aug 2018 08:51:53 GMT
+      Accept-Ranges: bytes
+      Content-Length: 52140
+      Content-Type: text/html
+      Cache-Control: private, max-age=300
+      Expires: Sat, 25 Aug 2018 04:00:08 GMT
+      Date: Sat, 25 Aug 2018 03:55:08 GMT
+      Connection: keep-alive
+      Set-Cookie: eaesssn=5778e7313d1f00001cd3805b78020000d42c0000; path=/; domain=.ikea.com
+      Set-Cookie: MyLocation=TH; expires=Sat, 25-Aug-2018 04:00:08 GMT
+      X-Content-Type-Options: nosniff
+      X-UA-Compatible: IE=edge
+      Server: IITP Server
+    */
+  $tStart = microtime(true);
+  $opts = [
+    CURLOPT_URL             => $url,
+    CURLOPT_HEADER          => TRUE,
+    CURLOPT_RETURNTRANSFER  => TRUE,
+    CURLOPT_FOLLOWLOCATION  => FALSE,
+  # CURLOPT_FRESH_CONNECT   => TRUE,
+  # CURLOPT_NOBODY          => TRUE,
+  # CURLOPT_FORBID_REUSE    => TRUE,
+  # CURLOPT_SSL_VERIFYHOST  => FALSE,
+  # CURLOPT_SSL_VERIFYPEER  => FALSE,
+  # CURLOPT_FAILONERROR     => TRUE,
+  # CURLOPT_SSL_VERIFYHOST  => FALSE,
+  # CURLOPT_SSL_VERIFYPEER  => FALSE,
+    CURLOPT_TIMEOUT         => 5,
+  ];
+  $ch = curl_init($url);
+    curl_reset($ch);
+    curl_setopt_array($ch, $opts);
+    curl_reset($ch);
+    curl_setopt_array($ch, $opts);
+  $sOK  = curl_exec($ch); 
+
+# MAYBE FAILED
+  if( is_bool($sOK) || empty($sOK) ):
+    echo $this->fnWhoops( curl_error($ch), $url );
+
+    return FALSE; // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  endif;
+  $elapsed = number_format( (float) microtime(true) - $tStart, 3);
+
+# ESSENTIAL TO CALL BEFORE CLOSING
+  # fred(curl_getinfo($ch));
+  curl_close($ch);
+
+# SET COLORS
+  $aOK = explode("\n", $sOK);
+  $clr = $this->_getColor($aOK);
+
+# MAYBE REDIRECT
+  $ok3 = [];
+  foreach($aOK as $id => $data):
+    if( strpos($data, ':') ):
+      $ok3[strstr($data, ':', true)] = strstr($data, ':', false);
+    endif;  
+  endforeach;  
+
+# WHATEVER
+  $fav = '<img class="fgr" src="' .$url .'/favicon.ico" width="40" height="40" alt="  favicon.ico MISSING???">';          
+  $hasRedirect = isset($ok3['Location']) || isset($ok3['location'])  
+            ? ''
+            . '<dd> &nbsp; </dd>'
+            . '<dt> <b class="tal"> Redirect_URL </b> </dt>'
+            . '<dd>' .substr($ok3['Location'],1) .'</dd>'
+            : '';
+  $maybeLF  = strpos($aOK[0], '200') 
+            ? '<dd> &nbsp; </dd>'
+            : '';
+
+  $tmp = <<< ____TMP
+    <p> &nbsp; <br></p>  
+    <b class="fsl">  
+      <a href="$url"> 
+        $url 
+        $fav
+      </a>
+    </b>  
+    <dl class="w88 mga bd1 $clr">
+      <dt class="flr ooo tar"> $elapsed secs </dt>    
+      <dt> $aOK[0] </dt>
+      $maybeLF
+      <dd>
+        $hasRedirect
+      </dd>
+    </dl>
+____TMP;
+  echo $tmp;
+
+  return FALSE; // NO RETURN $result;
+}
+
+
+//=======================================        
+//=======================================        
+PRIVATE function _getColor( array $aOK)
+:string
+{
+  $aHdr = $aOK[0];
+  if($aHdr && strpos($aHdr, '2') ):
+    $clr = 'bgg'; // NO PROBLEM
+  elseif($aHdr && strpos($aHdr, '3') ):  
+    $clr = 'bgo';
+  elseif($aHdr && strpos($aHdr, '4') ):  
+    $clr = 'bgr';
+  else:  
+    $clr = 'bgr';
+  endif;
+
+  return $clr;
+}
+
+
+//=======================================        
+//=======================================        
+PRIVATE function fnGetHeaders($url, $mode)
+:string
+{
+  $result = '<h2 class="tac"> Problem with site? </h2>';
+
+  $mStart = microtime(true);
+# https://www.sitepoint.com/community#report-ad    
+  $context =  stream_context_create(['http' => ['timeout' => 5]]);
+  $aHdr    = @get_headers($url, 0, $context);    
+  #$aHdr = @get_headers($url);// ?? 
+
+  $elapse = number_format( (float) microtime(true) - $mStart, 3);
+
+# ERRORS ???
+    if( is_bool($aHdr) ):
+      # echo $this->fnWhoops('Invalid URL ???', $url);
+      # die;
+      $aHdr[0] = '<b class="fsl">Strange problem with URL ??? </b>';
+    endif; 
+
+# RENDER
+  if($aHdr && strpos($aHdr[0], '2') ):
+    $clr = 'bgg'; // NO PROBLEM
+  elseif($aHdr && strpos($aHdr[0], '3') ):  
+    $clr = 'bgo';
+  elseif($aHdr && strpos($aHdr[0], '4') ):  
+    $clr = 'bgr';
+  else:  
+    $clr = 'bgr';
+  endif;
+# $filesize = '9999999999999999';  
+# $fSize    = '888888888888888';
+
+  echo '<br>',
+  $result   = $this->GetTable($url, $aHdr, $clr );   
+    
+  return $result;
+}
+
+
+//======================================================
+//======================================================
+PRIVATE function GetTable( string $url, array $aTable, string $clr ) 
+: string
+{
+  #  $result = [];
+  $qqq = $aTable[0];
+# fred($aTable, '$aTable');
+  $aTable = array_slice($aTable, 1, 999);
+
+  $result = '<dl class="w88 mga bd1 ' .$clr .'">'
+          . '<dt class="fsl"><a href="' .$url .'">' .$url .'</a></dt>'
+          . '<dd>' .$qqq .'</dt>';
+
+  foreach( $aTable as $tmp ):
+    if( strpos($tmp, ':') ):
+      $xx = strstr($tmp, ':', true);
+      $yy = substr(strstr($tmp, ':', false), 1);
+    else:
+      $xx = '<b>Location Response</b>';
+      $yy = $tmp;
+    endif;  
+      $result .= '<dt>' .$xx .'</dt>'
+              .  '<dd>' .$yy .'</dt>';
+  endforeach;
+  $result .= '</dl>';
+
+  return $result;    
+}//
 
 
 }///endclass 
