@@ -1,7 +1,7 @@
 <?php 
 # FAIL FAST FOR THIS FILE ONLY
   declare(strict_types=1);
-
+ 
 # DYNAMIC TOGGLE TEST
   defined('LOCALHOST') 
   || 
@@ -16,11 +16,11 @@
   endif;  
 
 # LOAD CLASS
-  require 'JB-Class.php';
-  $jb = new Class_Url;
+  require 'JB_Class.php';
+  $jb = new JB_Class;
 
   $aTitles = [
-    'Web Page Template ',
+    'JB-Web Page Template ',
     'Version: 004',
   ];
 
@@ -39,7 +39,7 @@
 
   elseif( isset($_POST['simple']) ):  
     $jb->renderForm( $aTitles, $sSites, $aHttps);
-    $jb->renderCurl($aModes, $aSites, $aHttps);
+    $jb->renderCurl($aSites, $aHttps);
 
   elseif(isset($_POST['verbose']) ):
     $jb->renderForm( $aTitles, $sSites, $aHttps);
