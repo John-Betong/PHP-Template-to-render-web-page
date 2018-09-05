@@ -602,6 +602,40 @@ PRIVATE function GetTable( string $url, array $aTable, string $clr )
 }//
 
 
+//=======================================        
+//=======================================        
+PRIVATE function fnWhoops(string $ERROR, string $url)
+:string 
+{
+  $whoops = <<< ____TMP
+    <dl class="bd1 bgr">
+      <dt> <a href="$url"> $url </a> </dt>    
+      <dt class="tac ">
+        $ERROR
+      </dt>  
+    </dl>  
+____TMP;
+
+  $whoops = <<< ____TMP
+    <p> &nbsp; <br></p>  
+    <b class="fsl">  
+      <a href="$url"> 
+        $url 
+      </a>
+    </b>  
+    <dl class="w88 mga bd1 bgr">
+      <dd> &nbsp; </dd>
+      <dt class="tac fsl">
+        $ERROR
+      </dt>  
+      <dd> &nbsp; </dd>
+    </dl>
+____TMP;
+
+  return $whoops;
+}
+
+
 }///endclass 
 
 //==========================================================
