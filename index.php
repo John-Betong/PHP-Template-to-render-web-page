@@ -20,8 +20,8 @@
   $jb = new JB_Class;
 
   $aTitles = [
-    'JB-Web Page Template ',
-    'Version: 004',
+    'John_Betong\'s Htaccess Redirection Tester',
+    'Version: 005',
   ];
 
 # GET VARIABLES
