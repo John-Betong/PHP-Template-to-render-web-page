@@ -109,6 +109,21 @@ PUBLIC function renderForm( array $aTitles, string $sSites, array $aHttps)
  
   $styleSheet = $this->getStyleSheet();
 
+  $blurb = <<< ____TMP
+    Test utility that returns http_response_code, etc from URLs.
+    <br><br>
+    Ideal for validating .htaccess URL redirections. 
+    <br><br>
+    Simply enter a URL for example, <b><i>sitepoint.com/forums</i></b> and the following detailed information will be returned.
+    <br>
+    <ul>
+      <li> http://sitepoint.com/forums </li>
+      <li> http://www.sitepoint.com/forums </li>
+      <li> https://sitepoint.com/forums </li>
+      <li> https://www.sitepoint.com/forums </li>
+    </ul>  
+    enjoy :)
+____TMP;
 
 $tmp   = <<< ______TMP
   <!DOCTYPE HTML>
@@ -122,38 +137,44 @@ $tmp   = <<< ______TMP
   <body> 
   <h1 class="fwb tac"> <a href="?"> $aTitles[0] </a> </h1>
   <h5 class="flr ooo"> $aTitles[1] </h5>
-
   <hr class="clb">
+
   <form action="?" method="post">
     <div class="w88 mga mn5 bgs">
-        <h2 class="bge">
-          Please enter URL names - ONLY one per line 
-        </h2>
+      <h2 class="bge">
+        Please enter URL names - ONLY one per line 
+      </h2>
 
-        <textarea name="URLS" class="w99 hgt p42 lh2 fwb">$sSites </textarea>
+      <div class="hgt">
+        <div class="flr w48 hgt bgs p42 bd1">
+          $blurb
+        </div> 
 
-        <div class="tac p42 fwb fsl">
-          <label> https://www. </label>
-            <input type="checkbox" name="http4" {$aHttps['http4']} >
-            \n
-          <label> https:// </label>
-            <input type="checkbox" name="http3" {$aHttps['http3']} />
-            \n
-          <label> http://www. </label>
-            <input type="checkbox" name="http2" {$aHttps['http2']} />
-            \n
-          <label> http:// </label>
-            <input class="fwb" type="checkbox" name="http1" {$aHttps['http1']} />
-            \n
-        </div>  
+        <textarea name="URLS" class="fll w48 hgt p42 lh2 fwb">$sSites </textarea>
+      </div>
 
-        <div class="tac p42 fwb">
-          <input class="$bgr4 flr" type="submit" name="sample"  value="samples"  />
-          <input class="$bgr1 fll" type="submit" name="clear"   value="clear"   />
-          <input class="$bgr2" type="submit" name="simple"  value="simple"  />
-          <input class="$bgr3" type="submit" name="verbose" value="verbose" />
-        </div>  
+      <div class="clb tac p42 fwb fsl">
+        <label> https://www. </label>
+          <input type="checkbox" name="http4" {$aHttps['http4']} >
+          \n
+        <label> https:// </label>
+          <input type="checkbox" name="http3" {$aHttps['http3']} />
+          \n
+        <label> http://www. </label>
+          <input type="checkbox" name="http2" {$aHttps['http2']} />
+          \n
+        <label> http:// </label>
+          <input class="fwb" type="checkbox" name="http1" {$aHttps['http1']} />
+          \n
       </div>  
+
+      <div class="tac p42 fwb">
+        <input class="$bgr4 flr" type="submit" name="sample"  value="samples"  />
+        <input class="$bgr1 fll" type="submit" name="clear"   value="clear"   />
+        <input class="$bgr2" type="submit" name="simple"  value="simple"  />
+        <input class="$bgr3" type="submit" name="verbose" value="verbose" />
+      </div>  
+    </div>  
   </form>
 ______TMP;
 echo $tmp;
@@ -221,17 +242,17 @@ PUBLIC function renderLetsEncrypt()
     $tmp = <<< ____TMP
       <p> <br> </p>
       <h1 class="w88 dib mga bd1 bgs tac">
-        <a 
+        <button>
+          <a 
           class="tal tdn"
           href="https://LetsEncrypt.org"> 
-          <button>
             <img 
               src="/assets/imgs/lets-497x357.png"
               width="497" height="357"
             alt="LetsEncrypt PNG"
             > 
-          </button>
         </a> 
+       </button>
       </h1>
 ____TMP;
     echo $tmp;  
@@ -337,14 +358,15 @@ PRIVATE function getStyleSheet()
     .fll {float: left;} .flr {float: right;} 
     .fss {font-size: small;} .fsl {font-size: x-large;}
     .hhh {display: none;}
+    .hgt {min-height:22em;}
     .lh2 {line-height: 2em;}
     .mga {margin: 0 auto;}
     .ooo {margin: 0; padding:0;}
-    .hgt {height: 8.88em;}
     .p42 {padding: 0.42em;}
     .tac {text-align: center;} 
     .tar {text-align: right;}
     .tdn {text-decoration: none;}
+    .w48 {width: 48%; max-width: 480px;}
     .w88 {width: 88%; max-width: 888px;}
     .w99 {width: 99.99%;}
 ____TMP;
